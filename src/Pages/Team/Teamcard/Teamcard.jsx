@@ -1,11 +1,12 @@
 import './Teamcard.css'
 import Aastha from '../../../assets/Images/Aastha.jpg'
 import Dhruvp from '../../../assets/Images/Dhruvp.jpg'
+import dhruv from '../../../assets/Images/dhruv jain.png'
 
 function Teamcard() {
   const teamMembers = [
-    { id: 1, img: Dhruvp , name: "Dhruv Pandey", role: "Founder & CEO", color: "#4f46e5" },
-    { id: 2, img: "DJ", name: "Dhruv Jain", role: "Timepass", color: "#0891b2" },
+    { id: 1, img: Dhruvp , name: "Dhruv Pandey", role: "Founder & CEO", color: null },
+    { id: 2, img: dhruv, name: "Dhruv Jain", role: "Timepass", color: null },
     { id: 3, img: "CK", name: "Charika Joshi", role: "Timepass", color: "#d97706" },
     { id: 4, img: Aastha, name: "Aastha", role: "Timepass", color: null },
   ];
@@ -24,7 +25,9 @@ function Teamcard() {
             )}
           </div>
           <h3 className="team-name">{item.name}</h3>
+          {/*
           <p className="team-role">{item.role}</p>
+          */}
         </div>
       ))}
     </>

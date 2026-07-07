@@ -11,7 +11,7 @@ function Team() {
         <h1>The people building the bridge.</h1>
       </div>
       <div className="team-content">
-        <p>A small team of educators, engineers, and parents who've lived the problem Acadex solves.</p>
+        <p>A small team of Engineers who've lived the problem Acadex solves.</p>
       </div>
       <div className="team-cards">
         <Teamcard />

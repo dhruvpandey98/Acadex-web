@@ -70,6 +70,11 @@
   letter-spacing: 0.3px;
   transition: all 0.25s ease;
   border: 2px solid transparent;
+  
+}
+.btns a{
+  text-decoration: none;
+  color: inherit;
 }
 
 .btns button:first-child {

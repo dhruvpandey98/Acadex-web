@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600&display=swap');
 
 .Contact {
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   padding: 100px 32px;
@@ -72,6 +73,7 @@
 
 .contact-right {
   flex: 1.2;
+  min-width: 0; /* fix: prevents flex child from overflowing parent when content (form) is wider than available space */
 }
 
 .contact-card {
@@ -80,6 +82,7 @@
   border-radius: 20px;
   padding: 40px;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.04);
+  box-sizing: border-box; /* fix: keeps padding from adding to the card's outer width */
 }
 
 .contact-form {
@@ -95,6 +98,7 @@
 
 .form-group {
   flex: 1;
+  min-width: 0; /* fix: allows inputs to shrink properly inside the flex row instead of overflowing */
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -109,6 +113,8 @@
 
 .form-group input,
 .form-group textarea {
+  width: 100%; /* fix: inputs/textarea now fill their container instead of using the browser default (~20 char) width */
+  box-sizing: border-box; /* fix: padding + border are now included in that 100% width, so nothing overflows the card */
   font-family: 'Inter', sans-serif;
   font-size: 14.5px;
   color: #1a1a2e;
@@ -172,6 +178,7 @@
     gap: 20px;
   }
 }
+
 .success-state {
   display: flex;
   flex-direction: column;
@@ -210,6 +217,7 @@
   color: #6b6b7d;
   margin: 0;
 }
+
 @media (max-width: 480px) {
   .contact-card {
     padding: 28px 22px;
