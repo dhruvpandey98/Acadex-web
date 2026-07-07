@@ -1,9 +1,12 @@
 import { useState } from 'react'
 import './Navbar.css'
 import Logo from '../../assets/Images/Acadex-logo.svg'
+import { useNavigate } from "react-router-dom";
+
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const navigate = useNavigate();
 
   return (
     <nav className="navbar">
@@ -22,12 +25,21 @@ function Navbar() {
             <li><a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a></li>
           </ul>
           <div className="mobile-portal-btn">
-            <button>Go to Portal</button>
+            <button
+              onClick={() => {
+                navigate("/portal");
+                setMenuOpen(false);
+              }}
+              >
+              Go to Portal
+            </button>
           </div>
         </div>
 
         <div className="portal-btn">
-          <button>Go to Portal</button>
+          <button onClick={() => navigate("/portal")}>
+            Go to Portal
+          </button>
         </div>
 
         <button

@@ -1,6 +1,10 @@
 import './Hero.css'
 import Image1 from '../../assets/Images/Image1.jpg'
+import { useNavigate } from "react-router-dom";
+
+
 function Hero() {
+  const navigate = useNavigate();
   return (
     <div className='Hero'>
         <div className="left">
@@ -15,7 +19,9 @@ function Hero() {
             </div>
             <div className="btns">
                 <button>Get Started</button>
-                <button>Go to Portal</button>
+                <button onClick={() => navigate("/portal")}>
+                   Go to Portal
+                </button>
             </div>
       </div>
       <div className="right">
