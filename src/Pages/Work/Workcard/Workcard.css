@@ -1,0 +1,75 @@
+.workflow-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.workflow-step {
+  display: flex;
+  flex-direction: column;
+}
+
+.badge-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.step-badge {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.connector {
+  flex: 1;
+  height: 0;
+  border-top: 2px dashed #d5d9ec;
+  margin-left: 14px;
+}
+
+.step-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 19px;
+  color: #1a1a2e;
+  margin: 0 0 10px 0;
+}
+
+.step-desc {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: #6b6b7d;
+  margin: 0 0 18px 0;
+}
+
+.step-role {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+@media (max-width: 900px) {
+  .workflow-row {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .connector {
+    display: none;
+  }
+}

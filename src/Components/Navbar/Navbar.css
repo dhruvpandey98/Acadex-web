@@ -1,0 +1,206 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&display=swap');
+
+.navbar {
+  width: 100%;
+  background-color: #ffffff;
+  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: 'Inter', sans-serif;
+}
+
+.logo img {
+  height: 50px;
+  width: auto;
+  display: block;
+}
+.links ul {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.links ul li a {
+  text-decoration: none;
+  color: #2d2d2d;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  letter-spacing: 0.2px;
+  position: relative;
+  padding: 6px 2px;
+  transition: color 0.25s ease;
+}
+
+.links ul li a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background-color: #4f46e5;
+  transition: width 0.25s ease;
+}
+
+.links ul li a:hover {
+  color: #4f46e5;
+}
+
+.links ul li a:hover::after {
+  width: 100%;
+}
+
+.portal-btn button {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: #ffffff;
+  background-color: #4f46e5;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  transition: background-color 0.25s ease, transform 0.2s ease;
+}
+
+.portal-btn button:hover {
+  background-color: #4338ca;
+  transform: translateY(-1px);
+}
+
+.portal-btn button:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .container {
+    flex-wrap: wrap;
+    row-gap: 12px;
+    padding: 14px 20px;
+  }
+
+  .links ul {
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+}
+/* Hamburger button - hidden on desktop */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  z-index: 1001;
+}
+
+.hamburger span {
+  width: 24px;
+  height: 2px;
+  background-color: #1a1a2e;
+  border-radius: 2px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.hamburger.open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+.mobile-portal-btn {
+  display: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 14px 20px;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+
+  .portal-btn {
+    display: none;
+  }
+
+  .links {
+    position: fixed;
+    top: 68px;
+    left: 0;
+    width: 100%;
+    background-color: #ffffff;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.3s ease, opacity 0.25s ease;
+  }
+
+  .links.open {
+    max-height: 400px;
+    opacity: 1;
+  }
+
+  .links ul {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    padding: 12px 24px;
+  }
+
+  .links ul li {
+    width: 100%;
+  }
+
+  .links ul li a {
+    display: block;
+    padding: 14px 0;
+    width: 100%;
+    border-bottom: 1px solid #f0f0f5;
+  }
+
+  .mobile-portal-btn {
+    display: block;
+    padding: 16px 24px 20px 24px;
+  }
+
+  .mobile-portal-btn button {
+    width: 100%;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #4f46e5;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+}

@@ -1,0 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600&display=swap');
+
+.Features {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 100px 32px;
+  text-align: center;
+}
+
+.Features .subhead p {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #4f46e5;
+  background-color: #eef2ff;
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+}
+
+.Features .heading h1 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 38px;
+  line-height: 1.3;
+  color: #1a1a2e;
+  max-width: 700px;
+  margin: 0 auto 20px auto;
+}
+
+.Features .title p {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.7;
+  color: #5a5a6e;
+  max-width: 620px;
+  margin: 0 auto 60px auto;
+}
+
+.Features .cards {
+  width: 100%;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .Features {
+    padding: 70px 24px;
+  }
+
+  .Features .heading h1 {
+    font-size: 28px;
+  }
+}

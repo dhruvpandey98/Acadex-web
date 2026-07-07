@@ -1,0 +1,67 @@
+.testi-card {
+  background-color: #ffffff;
+  border: 1px solid #eeeef2;
+  border-radius: 16px;
+  padding: 30px 26px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.testi-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px rgba(79, 70, 229, 0.12);
+  border-color: #c7d2fe;
+}
+
+.testi-rating {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 16px;
+}
+
+.testi-review {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: #5a5a6e;
+  margin: 0 0 24px 0;
+  flex: 1;
+}
+
+.testi-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.testi-avatar {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.testi-name {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: #1a1a2e;
+  margin: 0 0 2px 0;
+}
+
+.testi-role {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  color: #6b6b7d;
+  margin: 0;
+}

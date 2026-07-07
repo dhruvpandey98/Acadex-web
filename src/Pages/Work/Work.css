@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap');
+
+.Work {
+  width: 100%;
+  background-color: #f4f6fd;
+  padding: 90px 0;
+}
+
+.work-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.work-subhead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.work-subhead .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #d97706;
+  display: inline-block;
+}
+
+.work-subhead p {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #4f46e5;
+  margin: 0;
+}
+
+.work-title h1 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 42px;
+  line-height: 1.25;
+  color: #1a1a2e;
+  max-width: 620px;
+  margin: 0 0 20px 0;
+}
+
+.work-content p {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.7;
+  color: #6b6b7d;
+  max-width: 560px;
+  margin: 0 0 56px 0;
+}
+
+@media (max-width: 768px) {
+  .Work { padding: 60px 0; }
+  .work-title h1 { font-size: 28px; }
+}
