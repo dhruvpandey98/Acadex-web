@@ -13,7 +13,7 @@ const router = Router()
 const specs = {
   parents: { model: Parent, roles: ['admin', 'parent'], write: ['admin'], fields: ['userId', 'name', 'email', 'phone', 'occupation', 'address', 'children'] },
   students: { model: Student, roles: ['admin', 'teacher', 'student', 'parent'], write: ['admin'], fields: ['admissionNumber', 'userId', 'name', 'email', 'phone', 'dateOfBirth', 'gender', 'classId', 'section', 'rollNumber', 'parentIds', 'admissionDate', 'address', 'status'] },
-  teachers: { model: Teacher, roles: ['admin', 'teacher'], write: ['admin'], fields: ['employeeId', 'userId', 'name', 'email', 'phone', 'department', 'subjects', 'assignedClasses', 'joiningDate', 'qualification', 'status'] },
+  teachers: { model: Teacher, roles: ['admin', 'teacher', 'student', 'parent'], write: ['admin'], fields: ['employeeId', 'userId', 'name', 'email', 'phone', 'department', 'subjects', 'assignedClasses', 'joiningDate', 'qualification', 'status'] },
   classes: { model: SchoolClass, roles: ['admin', 'teacher', 'student', 'parent'], write: ['admin'], fields: ['name', 'section', 'academicYear', 'classTeacherId', 'students', 'subjects'] },
   subjects: { model: Subject, roles: ['admin', 'teacher', 'student', 'parent'], write: ['admin'], fields: ['name', 'subjectCode', 'classId', 'teacherId', 'description'] },
   attendance: { model: Attendance, roles: ['admin', 'teacher', 'student', 'parent'], write: ['admin', 'teacher'], fields: ['studentId', 'classId', 'date', 'status', 'remarks'] },
