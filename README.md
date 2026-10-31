@@ -1,216 +1,100 @@
-# Acadex — Student Tracking SaaS Dashboard
+# Acadex
 
-Acadex is a modern **Student Tracking SaaS Dashboard** built to simplify academic management for students, teachers, parents, and administrators. It offers a centralized platform for tracking student performance, attendance, assignments, grades, communication, and analytics.
+Acadex is a React/Vite school portal with an Express, MongoDB, and Socket.IO backend. Authentication and the core portal views use the API for school records, attendance, assignments, grades, announcements, fees, timetables, analytics, notifications, and messaging. The AI study buddy uses a configurable OpenAI-compatible provider and stores private conversation history.
 
-> **Status:** Actively in development. A dedicated **Coming Soon** portal page is currently being built ahead of the full platform launch.
+## Requirements
 
-**Live Demo:** [acadex-web-five.vercel.app](https://acadex-web-five.vercel.app/)
+- Node.js 20 or newer
+- MongoDB 6 or newer, locally or through Atlas
+- npm
 
----
+## Setup
 
-## Table of Contents
-
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Screenshots](#screenshots)
-- [Installation](#installation)
-- [Project Goals](#project-goals)
-- [Roadmap](#roadmap)
-- [Responsive Design](#responsive-design)
-- [Contributing](#contributing)
-- [License](#license)
-- [Author](#author)
-- [Support](#support)
-
----
-
-## Features
-
-- Student progress tracking
-- Attendance monitoring
-- Grades & report cards
-- Assignment management
-- AI-powered chatbot assistant
-- Real-time messaging
-- Smart notifications
-- Analytics & insights dashboard
-- Fully responsive design
-- Smooth UI animations and transitions
-
----
-
-## Tech Stack
-
-**Frontend**
-- React.js
-- JavaScript (ES6+)
-- CSS3
-- React Router DOM
-
-**Tooling**
-- Vite
-- ESLint
-- Git & GitHub
-- Font Awesome / React Icons
-
----
-
-## Project Structure
-
-```
-Acadexweb/
-│
-├── public/
-│
-├── src/
-│   ├── assets/
-│   ├── Components/
-│   │   ├── Cards/
-│   │   ├── Hero/
-│   │   ├── Navbar/
-│   │   └── Testcard/
-│   ├── Pages/
-│   │   ├── About/
-│   │   ├── Contact/
-│   │   ├── FAQ/
-│   │   ├── Features/
-│   │   ├── Footer/
-│   │   ├── Home/
-│   │   ├── Soon/          # Coming Soon portal page (in progress)
-│   │   ├── Team/
-│   │   ├── Testimonials/
-│   │   └── Work/
-│   ├── App.css
-│   ├── App.jsx
-│   ├── index.css
-│   └── main.jsx
-│
-├── .gitignore
-├── eslint.config.js
-├── index.html
-├── package.json
-├── package-lock.json
-├── vite.config.js
-└── README.md
-```
-
----
-
-
-## Installation
-
-**1. Clone the repository**
-```bash
-git clone https://github.com/yourusername/Acadex.git
-```
-
-**2. Navigate into the project**
-```bash
-cd Acadex
-```
-
-**3. Install dependencies**
-```bash
+```sh
+npm install
+cd server
 npm install
 ```
 
-**4. Run the development server**
-```bash
+Copy `.env.example` to `server/.env` and set unique JWT secrets (at least 32 characters each), `MONGODB_URI`, and the frontend origin. Never commit `.env`.
+
+On Windows PowerShell, copy the example using:
+
+```powershell
+Copy-Item .env.example server\.env
+```
+
+For MongoDB Atlas, create a cluster, add a database user, and allow your client IP under **Network Access**. In Atlas, choose **Connect → Drivers** and copy the connection string. Replace `<username>` and `<password>` with the database user's credentials (URL-encode any special characters), and use `acadex` as the database name. Paste the resulting URI as the `MONGODB_URI` value in `server/.env`; do not paste it into frontend files or commit it.
+
+Start the backend and frontend in separate terminals:
+
+```sh
+npm run dev:server
 npm run dev
 ```
 
-**5. Build for production**
-```bash
+The backend waits for a successful database connection before listening. Check `http://localhost:5000/api/health`; a healthy response is `{"status":"ok","database":"connected"}`. If it reports HTTP 503 or the backend logs a connection error, verify the Atlas URI, database user/password, and Network Access IP allowlist. Vite proxies `/api` and `/socket.io` to `http://localhost:5000`. Swagger UI is available at `http://localhost:5000/api/docs`.
+
+## Demo data
+
+Set `DEMO_PASSWORD` in `server/.env` before seeding if you want to choose a different development password. Then run:
+
+```sh
+npm run seed
+```
+
+The seed command requires `NODE_ENV=development` and is idempotent for its demo records. For a new Atlas database, run this after configuring `server/.env` and verifying Atlas access. Restart `npm run dev:server` after changing the environment file, then sign in through `http://localhost:5173/login` with one of the demo emails and the configured demo password.
+
+| Role | Email |
+|---|---|
+| Admin | `admin@acadex.demo` |
+| Teacher | `teacher@acadex.demo` |
+| Student | `student@acadex.demo` |
+| Parent | `parent@acadex.demo` |
+
+Development-only demo password: `Acadex-Demo-2026!` (unless overridden with `DEMO_PASSWORD`). The development login form pre-fills this demo password; login still requires a running API and a seeded account. The seed also creates 10 teachers, 100 students, 20 parent accounts, 10 classes, subjects, attendance, assignments, submissions, grades, fees, announcements, notifications, and timetable rows. Additional teacher/student/parent accounts follow the `teacherN@acadex.demo`, `studentNNN@acadex.demo`, and `parentNN@acadex.demo` patterns and use the same seed password.
+
+Public registration creates student accounts only. Admin, teacher, and parent demo accounts are provisioned by the development seed; there is no public admin registration endpoint.
+
+Admins can create linked student and teacher accounts from the portal by supplying a unique admission/employee number and a temporary password. Share the temporary password securely with the account holder.
+
+## Authentication and security
+
+- Access JWTs expire after 15 minutes; refresh JWTs expire after 7 days and rotate on refresh.
+- Both tokens are stored in HTTP-only, same-site cookies; only a password-free user profile is returned by auth endpoints.
+- Passwords use bcrypt with 12 rounds. Refresh tokens and reset tokens are persisted only as SHA-256 digests.
+- Login and password-reset endpoints have rate limits. Password reset requires SMTP configuration (`SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD`, and `MAIL_FROM`); when it is not configured, the API reports a configuration error rather than pretending an email was sent.
+- Roles and record ownership are checked on the server. Admin accounts cannot be created through public registration.
+- Uploads are limited to 10 MiB and PDF, PNG, JPEG, WebP, or plain-text MIME types.
+- Fee records are status tracking only; no payment gateway is connected.
+- AI tutor requests run server-side using the OpenAI-compatible provider configured by `AI_API_KEY`, `AI_MODEL`, and optionally `AI_BASE_URL`. Keep the provider key in the server environment only. The chat is explicitly unavailable until configured; requests are rate limited and chat history is private to the authenticated user.
+- School record, dashboard, messaging, and notification screens read from MongoDB-backed API endpoints. Class/subject catalogs, grades, fees, and timetable are currently read-only in the portal UI; their API resources support role-scoped CRUD where authorized.
+
+## API overview
+
+All endpoints are prefixed with `/api`.
+
+| Area | Routes |
+|---|---|
+| Auth | `POST /auth/register`, `/login`, `/logout`, `/refresh`, `/forgot-password`, `/reset-password`; `GET /auth/me`; `PATCH /auth/change-password` |
+| School records | CRUD collections at `/parents`, `/students`, `/teachers`, `/classes`, `/subjects`, `/attendance`, `/assignments`, `/submissions`, `/grades`, `/announcements`, `/fees`, `/timetable`; `PATCH /users/:id/status` is admin-only |
+| Attendance | `POST /attendance/bulk`, `GET /attendance/summary`, `GET /attendance/student/:studentId` |
+| Submissions | `PUT /submissions/:id/review` |
+| Messaging | `GET /conversations`, `POST /conversations`, `GET /messages/:conversationId`, `POST /messages`, `PATCH /messages/:id/read` |
+| Notifications | `GET /notifications`, `PATCH /notifications/:id/read`, `PATCH /notifications/read-all` |
+| Analytics | `GET /dashboard/admin`, `/teacher`, `/student`, `/parent` |
+| Uploads | `POST /uploads` (multipart field `file`), `GET /uploads/:id` |
+| AI study buddy | `GET /ai/conversations`, `POST /ai/conversations`, `GET`/`DELETE /ai/conversations/:id`, `POST /ai/conversations/:id/messages` |
+
+Collection list responses use `{ data, pagination }`; create and single-record responses use `{ data }`. List endpoints accept `page` and `limit` (maximum 100). Attendance is unique by student and UTC calendar day. Authenticated sockets join their own `user:<id>` room; joining `conversation:<id>` requires conversation membership. Events include `message:new`, `notification:new`, `assignment:new`, `announcement:new`, and `attendance:update`.
+
+## Development and tests
+
+```sh
+npm run lint
 npm run build
+cd server
+npm test
 ```
 
-**6. Preview the production build**
-```bash
-npm run preview
-```
-
----
-
-## Project Goals
-
-Acadex aims to:
-
-- Improve student performance tracking
-- Reduce manual academic management overhead
-- Enable better communication between teachers and parents
-- Provide actionable insights through analytics
-- Integrate AI-powered assistance for academic queries
-
----
-
-## Roadmap
-
-- [ ] User authentication
-- [ ] Role-based dashboards (student / teacher / parent / admin)
-- [ ] Firebase / MongoDB integration
-- [ ] AI-powered performance prediction
-- [ ] Calendar integration
-- [ ] Online assignment submission
-- [ ] File uploads
-- [ ] Dark mode
-- [ ] Email notifications
-- [ ] Mobile application
-- [ ] Public launch of the Coming Soon portal
-
----
-
-## Responsive Design
-
-Acadex is designed to work seamlessly across:
-
-- Desktop
-- Laptop
-- Tablet
-- Mobile devices
-
----
-
-## Contributing
-
-Contributions are welcome. To contribute:
-
-1. Fork the repository
-2. Create a feature branch
-   ```bash
-   git checkout -b feature-name
-   ```
-3. Commit your changes
-   ```bash
-   git commit -m "Added new feature"
-   ```
-4. Push to your branch
-   ```bash
-   git push origin feature-name
-   ```
-5. Open a Pull Request
-
----
-
-## License
-
-This project is licensed under the MIT License.
-
----
-
-## Author
-
-**Dhruv Pandey**
-Frontend Developer · Music Producer · B.Tech CSE (Data Science)
-
-- GitHub: [github.com/dhruvpandey98](https://github.com/dhruvpandey98)
-- LinkedIn: [linkedin.com/in/dhruv-pandey-043138303](https://www.linkedin.com/in/dhruv-pandey-043138303/)
----
-
-## Support
-
-If you find this project useful, please consider starring the repository. It helps others discover the project and supports future development.
-
----
-
-<p align="center">Made with care using React + Vite</p>
+Seed data is for local development only. Without seed data, empty collections and zero/empty dashboard metrics are expected. The study buddy requires server-side provider configuration; do not add provider credentials to frontend environment variables.

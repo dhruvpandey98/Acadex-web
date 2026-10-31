@@ -1,64 +1,33 @@
-import "./App.css";
-import { Routes, Route } from "react-router-dom";
+import { lazy, Suspense } from 'react'
+import { Navigate, Route, Routes } from 'react-router-dom'
+import { useApp } from './hooks/useApp.js'
 
-import About from "./Pages/About/About";
-import Features from "./Pages/Features/Features";
-import Home from "./Pages/Home/Home";
-import Team from "./Pages/Team/Team";
-import Work from "./Pages/Work/Work";
-import Testimonials from "./Pages/Testimonials/Testimonials";
-import FAQ from "./Pages/FAQ/FAQ";
-import Contact from "./Pages/Contact/Contact";
-import Footer from "./Pages/Footer/Footer";
-import Acadexcomingsoon from './Pages/Soon/AcadexComingSoon (1)'
+const LandingPage = lazy(() => import('./pages/landing/LandingPage.jsx'))
+const AuthPage = lazy(() => import('./pages/auth/AuthPage.jsx'))
+const PortalLayout = lazy(() => import('./components/layout/PortalLayout.jsx'))
+const PortalPage = lazy(() => import('./pages/portal/PortalPage.jsx'))
 
-function LandingPage() {
-  return (
-    <>
-      <section id="home">
-        <Home />
-      </section>
-
-      <section id="features">
-        <Features />
-      </section>
-
-      <section id="work">
-        <Work />
-      </section>
-
-      <section id="about">
-        <About />
-      </section>
-
-      <section id="team">
-        <Team />
-      </section>
-
-      <section id="testimonials">
-        <Testimonials />
-      </section>
-
-      <section id="faq">
-        <FAQ />
-      </section>
-
-      <section id="contact">
-        <Contact />
-      </section>
-
-      <Footer />
-    </>
-  );
+function ProtectedPortal() {
+  const { user, authLoading } = useApp()
+  if (authLoading) return <div className="route-loading">Checking your Acadex session…</div>
+  return user ? <PortalLayout /> : <Navigate to="/login" replace />
 }
 
-function App() {
-  return (
+export default function App() {
+  const { user, authLoading } = useApp()
+  if (authLoading) return <div className="route-loading">Opening your school day…</div>
+  return <Suspense fallback={<div className="route-loading">Opening your school day…</div>}>
     <Routes>
       <Route path="/" element={<LandingPage />} />
-      <Route path="/portal" element={<Acadexcomingsoon />} />
+      <Route path="/login" element={user ? <Navigate to="/portal" replace /> : <AuthPage mode="login" />} />
+      <Route path="/register" element={<AuthPage mode="register" />} />
+      <Route path="/forgot-password" element={<AuthPage mode="forgot" />} />
+      <Route path="/reset-password" element={<AuthPage mode="reset" />} />
+      <Route path="/portal" element={<ProtectedPortal />}>
+        <Route index element={<PortalPage />} />
+        <Route path=":section" element={<PortalPage />} />
+      </Route>
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
-  );
+  </Suspense>
 }
-
-export default App;

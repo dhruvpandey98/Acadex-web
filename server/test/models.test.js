@@ -1,0 +1,54 @@
+import assert from 'node:assert/strict'
+import { test } from 'node:test'
+import mongoose from 'mongoose'
+import { AssistantConversation, Attendance, Conversation, Grade, PasswordReset, Timetable, User } from '../src/models/index.js'
+
+test('attendance schema enforces one record per student and date', () => {
+  const uniqueAttendanceIndex = Attendance.schema.indexes().find(([keys, options]) => (
+    keys.studentId === 1 && keys.date === 1 && options.unique === true
+  ))
+  assert.ok(uniqueAttendanceIndex)
+})
+
+test('private credential fields are excluded from normal user queries', () => {
+  assert.equal(User.schema.path('passwordHash').options.select, false)
+  assert.equal(User.schema.path('refreshTokenHashes').options.select, false)
+  assert.equal(User.schema.path('tokenVersion').options.select, false)
+})
+
+test('password reset and conversation uniqueness have database indexes', () => {
+  assert.equal(PasswordReset.schema.path('expiresAt').options.expires, 0)
+  assert.equal(Conversation.schema.path('participantKey').options.unique, true)
+})
+
+test('study chat records are owned and keep a bounded, typed message history', () => {
+  assert.equal(AssistantConversation.schema.path('userId').options.required, true)
+  assert.equal(AssistantConversation.schema.path('messages').schema.path('role').enumValues.join(','), 'user,assistant')
+  assert.equal(AssistantConversation.schema.path('messages').schema.path('content').options.maxlength, 12000)
+})
+
+test('grades calculate percentages and reject marks above the total', async () => {
+  const refs = {
+    studentId: new mongoose.Types.ObjectId(),
+    subjectId: new mongoose.Types.ObjectId(),
+    classId: new mongoose.Types.ObjectId(),
+    teacherId: new mongoose.Types.ObjectId(),
+  }
+  const grade = new Grade({ ...refs, examName: 'Quiz', marksObtained: 75, totalMarks: 100, percentage: 0, grade: 'B' })
+  await grade.validate()
+  assert.equal(grade.percentage, 75)
+  const invalidGrade = new Grade({ ...refs, examName: 'Quiz', marksObtained: 101, totalMarks: 100, percentage: 101, grade: 'A' })
+  await assert.rejects(invalidGrade.validate(), /Marks obtained cannot exceed total marks/)
+})
+
+test('timetable entries require a valid end time after the start time', async () => {
+  const timetable = new Timetable({
+    classId: new mongoose.Types.ObjectId(),
+    subjectId: new mongoose.Types.ObjectId(),
+    teacherId: new mongoose.Types.ObjectId(),
+    dayOfWeek: 1,
+    startTime: '11:00',
+    endTime: '10:00',
+  })
+  await assert.rejects(timetable.validate(), /End time must be later than start time/)
+})
