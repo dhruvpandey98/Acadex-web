@@ -9,7 +9,8 @@ test('AI tutor prompt uses appropriate privacy guidance for students', () => {
   assert.match(prompt, /rather than simply doing graded work/)
 })
 
-test('AI provider response must contain non-empty assistant text', () => {
-  assert.equal(extractAssistantReply({ choices: [{ message: { content: '  Let us work it out.  ' } }] }), 'Let us work it out.')
-  assert.throws(() => extractAssistantReply({ choices: [] }), /empty or unsupported response/)
+test('Gemini response must contain non-empty assistant text', () => {
+  assert.equal(extractAssistantReply({ text: '  Let us work it out.  ' }), 'Let us work it out.')
+  assert.equal(extractAssistantReply({ candidates: [{ content: { parts: [{ text: 'Let us work it out.' }] } }] }), 'Let us work it out.')
+  assert.throws(() => extractAssistantReply({ candidates: [] }), /empty or unsupported response/)
 })
