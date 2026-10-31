@@ -2,7 +2,7 @@ import { GoogleGenAI } from '@google/genai'
 
 export function getGeminiConfig() {
   const apiKey = process.env.GEMINI_API_KEY?.trim()
-  const model = process.env.GEMINI_MODEL?.trim() || 'gemini-2.0-flash'
+  const model = process.env.GEMINI_MODEL?.trim() || 'gemini-3.8-flash'
 
   if (!apiKey) {
     return { configured: false, apiKey: null, model }

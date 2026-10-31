@@ -284,7 +284,7 @@ export function getAcademicToolDefinitions() {
     },
   ]
 
-  return definitions.map((definition) => ({ type: 'function', function: definition }))
+  return definitions
 }
 
 async function ensureTeacherAccess(user, classId) {
