@@ -4,24 +4,40 @@ import { Bell, BookOpen, CalendarDays, ChevronDown, ChevronLeft, GraduationCap, 
 import { useApp } from '../../hooks/useApp.js'
 import { navigationByRole } from '../../data/mockData.js'
 import { Avatar } from '../common/UI.jsx'
+import { portalApi } from '../../services/portalService.js'
 
 const icons = { Overview: LayoutDashboard, Analytics: LayoutDashboard, Reports: BookOpen, Students: Users, Teachers: Users, Classes: GraduationCap, Subjects: BookOpen, Attendance: CalendarDays, Assignments: BookOpen, Grades: BookOpen, Announcements: MessageSquare, Messages: MessageSquare, Timetable: CalendarDays, 'AI study buddy': MessageSquare, 'Fee status': BookOpen }
 
 export default function PortalLayout() {
-  const { user, logout, notifications, setNotifications } = useApp()
+  const { user, logout, notifications, refreshPortalData } = useApp()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
   const [notificationOpen, setNotificationOpen] = useState(false)
   const [globalSearch, setGlobalSearch] = useState('')
+  const [notificationError, setNotificationError] = useState('')
   const navigate = useNavigate()
   const location = useLocation()
   const sections = navigationByRole[user.role] || navigationByRole.Admin
   const unreadCount = notifications.filter((item) => item.unread).length
   const title = location.pathname.split('/')[2] || 'overview'
 
-  function signOut() {
-    logout()
+  async function signOut() {
+    try {
+      await logout()
+    } catch (error) {
+      console.error('Unable to complete Acadex server logout.', error)
+    }
     navigate('/')
+  }
+
+  async function markAllRead() {
+    try {
+      await portalApi.markNotificationsRead()
+      await refreshPortalData()
+      setNotificationError('')
+    } catch (error) {
+      setNotificationError(error.message)
+    }
   }
 
   return (
@@ -51,7 +67,7 @@ export default function PortalLayout() {
         <header className="topbar">
           <button className="icon-button menu-button" aria-label="Open navigation" onClick={() => setSidebarOpen(true)}><Menu size={20} /></button>
           <div className="breadcrumb"><span>Northstar Academy</span><span className="breadcrumb-slash">/</span><strong>{title.replace('-', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase())}</strong></div>
-          <div className="topbar-actions"><label className="global-search"><Search size={16} /><input placeholder="Search students or assignments..." value={globalSearch} onChange={(event) => setGlobalSearch(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && globalSearch.trim()) { const destination = user.role === 'Admin' || user.role === 'Teacher' ? '/portal/students' : '/portal/assignments'; navigate(`${destination}?search=${encodeURIComponent(globalSearch.trim())}`); setGlobalSearch('') } }} /><kbd>↵</kbd></label><div className="notification-wrap"><button className="icon-button notification-button" aria-label={`Notifications, ${unreadCount} unread`} onClick={() => setNotificationOpen(!notificationOpen)}><Bell size={18} />{unreadCount > 0 && <span className="notification-dot" />}</button>{notificationOpen && <div className="notification-popover"><div className="popover-heading"><strong>Notifications</strong><button onClick={() => setNotifications(notifications.map((item) => ({ ...item, unread: false })))}>Mark all read</button></div>{notifications.slice(0, 4).map((item) => <div className={`notification-item ${item.unread ? 'notification-unread' : ''}`} key={item.id}><span className="notification-icon"><Bell size={14} /></span><div><strong>{item.title}</strong><p>{item.detail}</p><small>{item.time}</small></div></div>)}</div>}</div><span className="topbar-divider" /><button className="topbar-profile" onClick={signOut}><Avatar name={user.name} color="violet" size="sm" /><span>{user.name}</span><ChevronDown size={14} /></button></div>
+          <div className="topbar-actions"><label className="global-search"><Search size={16} /><input placeholder="Search students or assignments..." value={globalSearch} onChange={(event) => setGlobalSearch(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && globalSearch.trim()) { const destination = user.role === 'Admin' || user.role === 'Teacher' ? '/portal/students' : '/portal/assignments'; navigate(`${destination}?search=${encodeURIComponent(globalSearch.trim())}`); setGlobalSearch('') } }} /><kbd>↵</kbd></label><div className="notification-wrap"><button className="icon-button notification-button" aria-label={`Notifications, ${unreadCount} unread`} onClick={() => setNotificationOpen(!notificationOpen)}><Bell size={18} />{unreadCount > 0 && <span className="notification-dot" />}</button>{notificationOpen && <div className="notification-popover"><div className="popover-heading"><strong>Notifications</strong><button onClick={markAllRead}>Mark all read</button></div>{notificationError && <p className="auth-notice" role="alert">{notificationError}</p>}{notifications.slice(0, 4).map((item) => <div className={`notification-item ${item.unread ? 'notification-unread' : ''}`} key={item.id}><span className="notification-icon"><Bell size={14} /></span><div><strong>{item.title}</strong><p>{item.detail}</p><small>{item.time}</small></div></div>)}</div>}</div><span className="topbar-divider" /><button className="topbar-profile" onClick={signOut}><Avatar name={user.name} color="violet" size="sm" /><span>{user.name}</span><ChevronDown size={14} /></button></div>
         </header>
         <div className="portal-content"><Outlet key={`${location.pathname}${location.search}`} /></div>
       </main>

@@ -1,43 +1,133 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { AppContext } from './appContext.js'
-import { initialAnnouncements, initialAssignments, initialNotifications, initialStudents, initialSubmissions, initialTeachers } from '../data/mockData.js'
-
-const STORAGE_KEY = 'acadex-demo-v1'
-
-function readStoredState() {
-  try {
-    const stored = window.localStorage.getItem(STORAGE_KEY)
-    return stored ? JSON.parse(stored) : {}
-  } catch (error) {
-    console.error('Unable to read Acadex demo data from local storage.', error)
-    return {}
-  }
-}
+import { authService } from '../services/authService.js'
+import { fetchPortalData } from '../services/portalService.js'
 
 export function AppProvider({ children }) {
-  const [storedState] = useState(readStoredState)
-  const [user, setUser] = useState(storedState.user || null)
-  const [students, setStudents] = useState(storedState.students || initialStudents)
-  const [teachers, setTeachers] = useState(storedState.teachers || initialTeachers)
-  const [assignments, setAssignments] = useState(storedState.assignments || initialAssignments)
-  const [submissions, setSubmissions] = useState(storedState.submissions || initialSubmissions)
-  const [announcements, setAnnouncements] = useState(storedState.announcements || initialAnnouncements)
-  const [notifications, setNotifications] = useState(storedState.notifications || initialNotifications)
-  const [attendance, setAttendance] = useState(storedState.attendance || {})
-  const [messages, setMessages] = useState(storedState.messages || {})
+  const [user, setUser] = useState(null)
+  const [authLoading, setAuthLoading] = useState(true)
+  const [authError, setAuthError] = useState('')
+  const [students, setStudents] = useState([])
+  const [teachers, setTeachers] = useState([])
+  const [assignments, setAssignments] = useState([])
+  const [submissions, setSubmissions] = useState([])
+  const [announcements, setAnnouncements] = useState([])
+  const [notifications, setNotifications] = useState([])
+  const [attendance, setAttendance] = useState({})
+  const [attendanceRecords, setAttendanceRecords] = useState([])
+  const [classes, setClasses] = useState([])
+  const [subjects, setSubjects] = useState([])
+  const [grades, setGrades] = useState([])
+  const [fees, setFees] = useState([])
+  const [timetable, setTimetable] = useState([])
+  const [dashboard, setDashboard] = useState(null)
+  const [portalDataLoading, setPortalDataLoading] = useState(false)
+  const [portalDataError, setPortalDataError] = useState('')
 
   useEffect(() => {
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ user, students, teachers, assignments, submissions, announcements, notifications, attendance, messages }))
-    } catch (error) {
-      console.error('Unable to save Acadex demo data to local storage.', error)
+    let active = true
+    const restoreSession = async () => {
+      try {
+        const result = await authService.currentUser()
+        if (active) setUser(toDisplayUser(result.user))
+      } catch (error) {
+        if (active) {
+          setUser(null)
+          if (error.status !== 401) setAuthError(error.message)
+        }
+      } finally {
+        if (active) setAuthLoading(false)
+      }
     }
-  }, [user, students, teachers, assignments, submissions, announcements, notifications, attendance, messages])
+    const clearSession = () => setUser(null)
+    window.addEventListener('acadex:unauthorized', clearSession)
+    restoreSession()
+    return () => {
+      active = false
+      window.removeEventListener('acadex:unauthorized', clearSession)
+    }
+  }, [])
+
+  const refreshPortalData = useCallback(async () => {
+    if (!user) return false
+    setPortalDataLoading(true)
+    setPortalDataError('')
+    try {
+      const data = await fetchPortalData(user)
+      setStudents(data.students)
+      setTeachers(data.teachers)
+      setAssignments(data.assignments)
+      setSubmissions(data.submissions)
+      setAnnouncements(data.announcements)
+      setNotifications(data.notifications)
+      setAttendance(data.attendance)
+      setAttendanceRecords(data.attendanceRecords)
+      setClasses(data.classes)
+      setSubjects(data.subjects)
+      setGrades(data.grades)
+      setFees(data.fees)
+      setTimetable(data.timetable)
+      setDashboard(data.dashboard)
+      return true
+    } catch (error) {
+      setPortalDataError(error.message)
+      return false
+    } finally {
+      setPortalDataLoading(false)
+    }
+  }, [user])
+
+  useEffect(() => {
+    if (user) {
+      refreshPortalData()
+      return
+    }
+    setStudents([])
+    setTeachers([])
+    setAssignments([])
+    setSubmissions([])
+    setAnnouncements([])
+    setNotifications([])
+    setAttendance({})
+    setAttendanceRecords([])
+    setClasses([])
+    setSubjects([])
+    setGrades([])
+    setFees([])
+    setTimetable([])
+    setDashboard(null)
+    setPortalDataError('')
+  }, [user, refreshPortalData])
 
   const value = useMemo(() => ({
     user,
-    login: (role, email) => setUser({ role, email, name: role === 'Parent' ? 'Jamie Chen' : role === 'Student' ? 'Olivia Chen' : role === 'Teacher' ? 'Sophie Anderson' : 'Alex Morgan' }),
-    logout: () => setUser(null),
+    authLoading,
+    authError,
+    login: async (email, password) => {
+      const result = await authService.login(email, password)
+      const displayUser = toDisplayUser(result.user)
+      setUser(displayUser)
+      setAuthError('')
+      return displayUser
+    },
+    register: async (name, email, password) => {
+      const result = await authService.register(name, email, password)
+      const displayUser = toDisplayUser(result.user)
+      setUser(displayUser)
+      setAuthError('')
+      return displayUser
+    },
+    logout: async () => {
+      try {
+        await authService.logout()
+        setAuthError('')
+      } catch (error) {
+        setAuthError(`Your browser session ended, but the server logout request failed: ${error.message}`)
+        throw error
+      } finally {
+        setUser(null)
+      }
+    },
     students,
     setStudents,
     teachers,
@@ -52,9 +142,21 @@ export function AppProvider({ children }) {
     setNotifications,
     attendance,
     setAttendance,
-    messages,
-    setMessages,
-  }), [user, students, teachers, assignments, submissions, announcements, notifications, attendance, messages])
+    attendanceRecords,
+    classes,
+    subjects,
+    grades,
+    fees,
+    timetable,
+    dashboard,
+    portalDataLoading,
+    portalDataError,
+    refreshPortalData,
+  }), [user, authLoading, authError, students, teachers, assignments, submissions, announcements, notifications, attendance, attendanceRecords, classes, subjects, grades, fees, timetable, dashboard, portalDataLoading, portalDataError, refreshPortalData])
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>
+}
+
+function toDisplayUser(user) {
+  return { ...user, role: user.role[0].toUpperCase() + user.role.slice(1) }
 }

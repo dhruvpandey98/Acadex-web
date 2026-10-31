@@ -8,12 +8,14 @@ const PortalLayout = lazy(() => import('./components/layout/PortalLayout.jsx'))
 const PortalPage = lazy(() => import('./pages/portal/PortalPage.jsx'))
 
 function ProtectedPortal() {
-  const { user } = useApp()
+  const { user, authLoading } = useApp()
+  if (authLoading) return <div className="route-loading">Checking your Acadex session…</div>
   return user ? <PortalLayout /> : <Navigate to="/login" replace />
 }
 
 export default function App() {
-  const { user } = useApp()
+  const { user, authLoading } = useApp()
+  if (authLoading) return <div className="route-loading">Opening your school day…</div>
   return <Suspense fallback={<div className="route-loading">Opening your school day…</div>}>
     <Routes>
       <Route path="/" element={<LandingPage />} />
